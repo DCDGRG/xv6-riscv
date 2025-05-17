@@ -15,6 +15,10 @@ struct proc *initproc;
 int nextpid = 1;
 struct spinlock pid_lock;
 
+//use extern to make syscall count variable visible to other files
+extern uint64 total_syscall_count;    
+extern struct spinlock syscall_count_lock;
+
 extern void forkret(void);
 static void freeproc(struct proc *p);
 
@@ -51,6 +55,10 @@ procinit(void)
   
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
+
+  initlock(&syscall_count_lock, "syscall_count"); // Initialize syscall count lock
+  total_syscall_count = 0;  //define syscall count variable
+
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
@@ -124,6 +132,7 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
+  p->syscall_count = 0; // Initialize per-process syscall count
 
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){

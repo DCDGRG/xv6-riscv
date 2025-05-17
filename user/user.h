@@ -39,3 +39,13 @@ void free(void*);
 int atoi(const char*);
 int memcmp(const void *, const void *, uint);
 void *memcpy(void *, const void *, uint);
+
+struct pinfo 
+{
+    int ppid;
+    int syscall_count;
+    int page_usage;
+};
+
+int sysinfo(int);
+int procinfo(struct pinfo*);
